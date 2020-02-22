@@ -22,6 +22,8 @@ const Counter = ({ max, step }) => {
 
   useEffect(() => {
     document.title = `Counter : ${count}`;
+    const id = setInterval(() => console.log(`Count: ${count}`), 1000);
+    return () => clearInterval(id);
   }, [count]);
 
   return (
