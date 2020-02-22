@@ -20,6 +20,16 @@ class Counter extends Component {
     this.reset = this.reset.bind(this);
   }
 
+  updateDocumentTitle() {
+    document.title = `Count is ${this.state.count}`;
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.count !== this.state.count) {
+      this.updateDocumentTitle();
+    }
+  }
+
   increment() {
     this.setState(
       (state, props) => {
