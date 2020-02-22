@@ -10,9 +10,10 @@ class Counter extends Component {
   }
 
   increment() {
+    const { max, step } = this.props;
     this.setState(state => {
-      if (state.count >= 5) return;
-      return { count: state.count + 1 };
+      if (state.count >= max) return;
+      return { count: state.count + step };
     });
   }
 
