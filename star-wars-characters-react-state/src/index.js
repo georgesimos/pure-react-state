@@ -18,7 +18,7 @@ const useFetch = url => {
     setResponse(null);
     setError(null);
 
-    const fetchUrl = async () => {
+    (async function() {
       try {
         const response = await fetch(url);
         const data = await response.json();
@@ -28,9 +28,7 @@ const useFetch = url => {
       } finally {
         setLoading(false);
       }
-    };
-
-    fetchUrl();
+    })();
   }, []);
 
   return [response, loading, error];
