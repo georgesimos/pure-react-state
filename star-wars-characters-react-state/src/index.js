@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from 'react';
+import React, { useReducer } from 'react';
 import ReactDOM from 'react-dom';
 
 import { BrowserRouter as Router } from 'react-router-dom';
@@ -39,25 +39,19 @@ const reducer = (state, action) => {
   return state;
 };
 
-// const useFetch = url => {
-//   const [state, dispatch] = React.useReducer(fetchReducer, initialState);
-
-//   useEffect(() => {
-//     dispatch({ type: 'LOADING' });
-
-//     (async function fetchUrl() {
-//       try {
-//         const response = await fetch(url);
-//         const data = await response.json();
-//         dispatch({ type: 'RESPONSE_COMPLETE', payload: { characters: data } });
-//       } catch (error) {
-//         dispatch({ type: 'ERROR', payload: { error } });
-//       }
-//     })();
-//   }, []);
-
-//   return [state.characters, state.loading, state.error];
-// };
+const fetchCharacters = dispatch => {
+  fetch(endpoint + '/characters')
+    .then(response => response.json())
+    .then(response =>
+      dispatch({
+        type: 'RESPONSE_COMPLETE',
+        payload: { characters: response.characters },
+      }),
+    )
+    .catch(error => {
+      dispatch({ type: 'ERROR', payload: { error } });
+    });
+};
 
 const useThunkReducer = (reducer, initialState) => {
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -78,7 +72,7 @@ const useThunkReducer = (reducer, initialState) => {
 const Application = () => {
   const [state, dispatch] = useThunkReducer(reducer, initialState);
 
-  const { characters, loading, error } = state;
+  const { characters } = state;
 
   return (
     <div className="Application">
@@ -87,8 +81,10 @@ const Application = () => {
       </header>
       <main>
         <section className="sidebar">
-          {loading ? <p>Loading</p> : <CharacterList characters={characters} />}
-          {error && <p className="error"> {error.message}</p>}
+          <button onClick={() => dispatch(fetchCharacters)}>
+            Fetch Characters
+          </button>
+          <CharacterList characters={characters} />
         </section>
       </main>
     </div>
