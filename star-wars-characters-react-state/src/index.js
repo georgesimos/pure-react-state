@@ -5,32 +5,38 @@ import { BrowserRouter as Router } from 'react-router-dom';
 
 import CharacterList from './CharacterList';
 
-import dummyData from './dummy-data';
-
 import endpoint from './endpoint';
 import './styles.scss';
 
-const Application = () => {
-  const [characters, setCharacters] = useState([]);
+const useFetch = url => {
+  const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     setLoading(true);
-    setCharacters([]);
+    setResponse(null);
     setError(null);
 
-    fetch(endpoint + '/characters')
+    fetch(url)
       .then(response => response.json())
-      .then(({ characters }) => {
+      .then(response => {
         setLoading(false);
-        setCharacters(characters);
+        setResponse(response);
       })
       .catch(error => {
         setLoading(false);
         setError(error);
       });
   }, []);
+
+  return [response, loading, error];
+};
+
+const Application = () => {
+  const [response, loading, error] = useFetch(endpoint + '/characters');
+
+  const characters = (response && response.characters) || [];
 
   return (
     <div className="Application">
