@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import ReactDOM from 'react-dom';
 
 import { BrowserRouter as Router } from 'react-router-dom';
@@ -9,29 +9,29 @@ import endpoint from './endpoint';
 import './styles.scss';
 
 const initialState = {
-  result: null,
+  characters: [],
   loading: true,
   error: null,
 };
 
-const fetchReducer = (state, action) => {
+const reducer = (state, action) => {
   if (action.type === 'LOADING') {
     return {
-      result: null,
+      characters: [],
       loading: true,
       error: null,
     };
   }
   if (action.type === 'RESPONSE_COMPLETE') {
     return {
-      result: action.payload.response,
+      characters: action.payload.characters,
       loading: false,
       error: null,
     };
   }
   if (action.type === 'ERROR') {
     return {
-      result: null,
+      characters: [],
       loading: true,
       error: action.payload.error,
     };
@@ -39,30 +39,46 @@ const fetchReducer = (state, action) => {
   return state;
 };
 
-const useFetch = url => {
-  const [state, dispatch] = React.useReducer(fetchReducer, initialState);
+// const useFetch = url => {
+//   const [state, dispatch] = React.useReducer(fetchReducer, initialState);
 
-  useEffect(() => {
-    dispatch({ type: 'LOADING' });
+//   useEffect(() => {
+//     dispatch({ type: 'LOADING' });
 
-    (async function fetchUrl() {
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-        dispatch({ type: 'RESPONSE_COMPLETE', payload: { response: data } });
-      } catch (error) {
-        dispatch({ type: 'ERROR', payload: { error } });
-      }
-    })();
-  }, []);
+//     (async function fetchUrl() {
+//       try {
+//         const response = await fetch(url);
+//         const data = await response.json();
+//         dispatch({ type: 'RESPONSE_COMPLETE', payload: { characters: data } });
+//       } catch (error) {
+//         dispatch({ type: 'ERROR', payload: { error } });
+//       }
+//     })();
+//   }, []);
 
-  return [state.result, state.loading, state.error];
+//   return [state.characters, state.loading, state.error];
+// };
+
+const useThunkReducer = (reducer, initialState) => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const enhancedDsipatch = action => {
+    console.log(action);
+
+    if (typeof action === 'function' || action instanceof Function) {
+      action(dispatch);
+    } else {
+      dispatch(action);
+    }
+  };
+
+  return [state, enhancedDsipatch];
 };
 
 const Application = () => {
-  const [response, loading, error] = useFetch(endpoint + '/characters');
+  const [state, dispatch] = useThunkReducer(reducer, initialState);
 
-  const characters = (response && response.characters) || [];
+  const { characters, loading, error } = state;
 
   return (
     <div className="Application">
