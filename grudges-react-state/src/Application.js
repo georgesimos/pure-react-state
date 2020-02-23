@@ -5,7 +5,7 @@ import NewGrudge from './NewGrudge';
 import { GrudgeContext } from './GrudgeContext';
 
 const Application = () => {
-  const { undo, isPast } = useContext(GrudgeContext);
+  const { undo, redo, isPast, isFuture } = useContext(GrudgeContext);
 
   return (
     <div className="Application">
@@ -14,7 +14,9 @@ const Application = () => {
         <button disabled={!isPast} onClick={undo}>
           Undo
         </button>
-        <button>Redo</button>
+        <button disabled={!isFuture} onClick={redo}>
+          Redo
+        </button>
       </section>
       <Grudges />
     </div>
